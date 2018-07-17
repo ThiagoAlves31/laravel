@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Balance;
+use App\User;
 use App\Http\Requests\MoneyValidationFormRequest;
 
 class BalanceController extends Controller
@@ -68,8 +69,28 @@ class BalanceController extends Controller
         return view('admin.balance.transfer')   ;
     }
 
-    public function confirmTransfer(Request $request)
+    public function confirmTransfer(Request $request, User $user)
+    {   
+        $query = $sender = $user->getSender($request->value);
+
+        if(!$query)
+        {
+            return redirect()
+                    ->back()
+                    ->with('error','Usuário não encontrado');
+        }
+        if($query->id === auth()->user()->id)
+        {
+            return redirect()
+                    ->back()
+                    ->with('error','Usuário não pode ser o mesmo');
+        }
+        
+        return view('admin.balance.transfer-confirm', compact('query'));
+    }
+
+    public function transferStore(Request $request)
     {
-        return dd($request->all())   ;
+        return dd($request->all());
     }
 }

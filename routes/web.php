@@ -3,6 +3,8 @@
 //Grupo dos administradores
 Route::group(['middleware' => ['auth'],'namespace' => 'Admin','prefix' => 'admin' ],function(){
     
+    
+    $this->post('transfer', 'BalanceController@transferStore')->name('transfer.store');
     $this->post('confirm-transfer', 'BalanceController@confirmTransfer')->name('confirm.transfer');
     $this->get('transfer', 'BalanceController@transfer')->name('balance.transfer');
 
