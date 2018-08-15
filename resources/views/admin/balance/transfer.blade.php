@@ -26,7 +26,7 @@
                     <input type="text" placeholder="Nome ou email do destinatário" name="value" class="form-control">
                 </div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-success">Sacar</button>
+                    <button type="submit" class="btn btn-success">Escolher</button>
                 </div>
             </form
         </div>

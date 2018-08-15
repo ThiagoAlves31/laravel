@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\User;
 use DB;
 
 class Balance extends Model
@@ -79,5 +80,46 @@ class Balance extends Model
                 'message' => 'Falha ao sacar'
             ];
         }
+    }
+
+    public function transfer(float $value, User $user) : array
+    {
+        if($this->amount < $value)
+        {
+            return [
+                'success' => false,
+                'message' => 'Saldo insuficiente',
+            ];
+        }
+        
+        DB::beginTransaction();
+
+        $total_before = $this->amount ? $this->amount : 0 ;
+        $this->amount -= number_format($value, 2 ,'.', '');
+        $withdrawn = $this->save();
+
+        $historic = auth()->user()->historics()->create([
+                                                        'type'          => 'O',
+                                                        'amount'        => $value,
+                                                        'total_before'  => $total_before,
+                                                        'total_after'   => $this->amount,
+                                                        'date'          => date('Ymd'),
+                                                        ]);
+
+        if($withdrawn && $historic)
+        {
+            DB::commit();
+            return [
+                'success' => 'true',
+                'message' => 'Saque com sucesso'
+            ];
+        }else{
+            DB::rollback();
+            return [
+                'success' => 'false',
+                'message' => 'Falha ao sacar'
+            ];
+        }
+
     }
 }
